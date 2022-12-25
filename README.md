@@ -29,11 +29,7 @@ Major Components of the Project:
 	Client
 
 Server (Central Index Server):
-This server indexes the content of all the peers (i.e., Clients) that register with it. It also provides search facility to peers.
-Server Functionalities:
-	Registry and
-	Search
-
+This server indexes the content of all the peers (i.e., Clients) that register with it.
 Client:
 As a client, the user specifies a file name with the indexing server using "lookup". The indexing server returns a list of all other peers that hold the file. The user can pick one such peer and the client then connects to this peer and downloads the file. 
 Major function of the peer:
@@ -42,12 +38,6 @@ As a server, the peer waits for requests from other peers and sends the requeste
 
 The peers provide the following interface to the users: 
 1. Register – registers the file into the server
-2. Search – searches the server for a file and returns the list of Clients 
-3. Download – downloads the file from another Client
-
-
-How to Run the Project::
--> Run the makefile using the make command
--> Follow the instructions
+2. Download – downloads the file from another Client
 
 For starting different peers (i.e., Clients), use different command prompts for execution
