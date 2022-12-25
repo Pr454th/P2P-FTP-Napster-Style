@@ -46,4 +46,8 @@ The peers provide the following interface to the users:
 3. Download – downloads the file from another Client
 
 
+How to Run the Project::
+-> Run the makefile using the make command
+-> Follow the instructions
+
 For starting different peers (i.e., Clients), use different command prompts for execution

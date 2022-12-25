@@ -31,7 +31,6 @@ public class ServerDownload extends Thread
     			dwldServerSocket = new ServerSocket(peerServerPort);
     			dwldSocket = dwldServerSocket.accept();
     			new ServerDownloadThread(dwldSocket,directoryPath).start();
-
         } 
     	catch (IOException ex) {
     			Logger.getLogger(ServerDownload.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,8 +51,8 @@ class ServerDownloadThread extends Thread
     {
         try
         {
-            ObjectInputStream objIS = new ObjectInputStream(dwldThreadSocket.getInputStream());
             ObjectOutputStream objOS = new ObjectOutputStream(dwldThreadSocket.getOutputStream());
+            ObjectInputStream objIS = new ObjectInputStream(dwldThreadSocket.getInputStream());
             
             String fileName = (String)objIS.readObject();
             String fileLocation;// Stores the directory name
