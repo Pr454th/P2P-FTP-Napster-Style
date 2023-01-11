@@ -17,7 +17,6 @@ public class Server {
 	public static ArrayList<FileInfo> globalArray = new ArrayList<FileInfo>();
 
 	@SuppressWarnings("resource")
-	// public static void main(String args[])
 	public Server() throws NumberFormatException, IOException {
 
 		ServerSocket serverSocket = null;
