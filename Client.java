@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 public class Client {
 	@SuppressWarnings({ "unchecked", "rawtypes", "resource", "unused" })
-	// public static void main(String args[]) throws Exception
 	public Client() {
 		Socket socket;
 		ArrayList al;
@@ -47,7 +46,7 @@ public class Client {
 			al = new ArrayList();
 
 			socket = new Socket("localhost", 7799);
-			System.out.println("Connection has been established with the client");
+			System.out.println("Connection has been established with the server");
 
 			ois = new ObjectInputStream(socket.getInputStream());
 			oos = new ObjectOutputStream(socket.getOutputStream());
@@ -67,47 +66,60 @@ public class Client {
 			}
 
 			oos.writeObject(arrList);
-			// System.out.println("The complete ArrayList :::"+arrList);
-			System.out.print(
-					"Enter the desired file name that you want to downloaded from the list of the files available in the Server : ");
-			String fileNameToDownload = br.readLine();
-			oos.writeObject(fileNameToDownload);
+			while(true){
+				System.out.print("Enter the desired file name that you want to downloaded from the list of the files available in the Server : ");
+				String fileNameToDownload = br.readLine();
+				oos.writeObject(fileNameToDownload);
 
-			System.out.println("Waiting for the reply from Server...!!");
+				System.out.println("Waiting for the reply from Server...!!");
 
-			ArrayList<FileInfo> peers = new ArrayList<FileInfo>();
-			peers = (ArrayList<FileInfo>) ois.readObject();
-			if (peers.size() == 0) {
-				System.out.println("Requested file not found in any of the peers !!!");
-			} else {
-				for (int i = 0; i < peers.size(); i++) {
-					int result = peers.get(i).peerid;
-					int port = peers.get(i).portNumber;
-					System.out.println("The file is stored at peer id " + result + " on port " + port);
-				}
-				int clientAsServerPortNumber = 0, clientAsServerPeerid = 0;
-				int chk = 1;
-				while (chk != 0) {
-					System.out.println("Enter the desired peer id from which you want to download the file from :");
-					clientAsServerPeerid = Integer.parseInt(br.readLine());
-
-					for (int i = 0; i < peers.size(); i++) {
-						int result = peers.get(i).peerid;
-						int port = peers.get(i).portNumber;
-						if (result == clientAsServerPeerid) {
-							clientAsServerPortNumber = port;
-							chk = 0;
-							break;
+				ArrayList<FileInfo> peers = new ArrayList<FileInfo>();
+				String ack=(String) ois.readObject();
+				if(ack.equals("Found")){
+					peers = (ArrayList<FileInfo>) ois.readObject();
+					if (peers.size() == 0) {
+						System.out.println("Requested file not found in any of the peers !!!");
+					} 
+					else {
+						for (int i = 0; i < peers.size(); i++) {
+							int result = peers.get(i).peerid;
+							int port = peers.get(i).portNumber;
+							System.out.println("The file is stored at peer id " + result + " on port " + port);
 						}
-					}
-					if (chk == 1) {
-						System.out.println("Entered PeerID Not Found.\nPlease Try Again...");
+						int clientAsServerPortNumber = 0, clientAsServerPeerid = 0;
+						int chk = 1;
+						while (chk != 0) {
+							System.out.println("Enter the desired peer id from which you want to download the file from :");
+							clientAsServerPeerid = Integer.parseInt(br.readLine());
+
+							for (int i = 0; i < peers.size(); i++) {
+								int result = peers.get(i).peerid;
+								int port = peers.get(i).portNumber;
+								if (result == clientAsServerPeerid) {
+									clientAsServerPortNumber = port;
+									chk = 0;
+									break;
+								}
+							}
+							if (chk == 1) {
+								System.out.println("Entered PeerID Not Found.\nPlease Try Again...");
+							}
+						}
+						clientAsServer(clientAsServerPeerid, clientAsServerPortNumber, fileNameToDownload, directoryPath);
 					}
 				}
-				clientAsServer(clientAsServerPeerid, clientAsServerPortNumber, fileNameToDownload, directoryPath);
+				else{
+					System.out.println("File Not Found!!");
+				}
+				System.out.print("Enter 1 to continue or 0 to Exit : ");
+				String flg = br.readLine();
+				oos.writeObject(flg);
+				if(flg.equals("0")){
+					break;
+				}
 			}
-
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			System.out.println("Error in establishing the Connection between the Client and the Server!! ");
 			System.out.println("Please cross-check the host address and the port number..");
 		}
@@ -124,9 +136,6 @@ public class Client {
 
 			clientAsServerOOS.writeObject(fileNamedwld);
 			int readBytes = (int) clientAsServerOIS.readObject();
-
-			// System.out.println("Number of bytes that have been transferred are
-			// ::"+readBytes);
 
 			byte[] b = new byte[readBytes];
 			clientAsServerOIS.readFully(b);

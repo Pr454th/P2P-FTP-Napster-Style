@@ -31,10 +31,9 @@ public class Server {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		while (true) {
+		while(true){
 			try {
 				socket = serverSocket.accept();
-				// serverSocket.close();
 			} catch (IOException e) {
 				System.out.println("I/O error: " + e);
 			}
@@ -55,8 +54,8 @@ class ServerTestClass extends Thread {
 	ArrayList<FileInfo> filesList = new ArrayList<FileInfo>();
 	ObjectOutputStream oos;
 	ObjectInputStream ois;
-	String str;
-	int index;
+	String str,flg;
+	int index=-1;
 
 	@SuppressWarnings("unchecked")
 	public void run() {
@@ -82,28 +81,48 @@ class ServerTestClass extends Thread {
 			System.out.println("Class not found exception");
 		}
 
-		try {
-			str = (String) ois.readObject();
-		} catch (IOException | ClassNotFoundException ex) {
-			Logger.getLogger(ServerTestClass.class.getName()).log(Level.SEVERE, null, ex);
-		}
-
-		ArrayList<FileInfo> sendingPeers = new ArrayList<FileInfo>();
-		System.out.println("Searching for the file name...!!!");
-
-		for (int j = 0; j < globalArray.size(); j++) {
-			FileInfo fileInfo = globalArray.get(j);
-			Boolean tf = fileInfo.fileName.equals(str);
-			if (tf) {
-				index = j;
-				sendingPeers.add(fileInfo);
+		while(true){
+			try {
+				str = (String) ois.readObject();
+			} catch (IOException | ClassNotFoundException ex) {
+				Logger.getLogger(ServerTestClass.class.getName()).log(Level.SEVERE, null, ex);
 			}
-		}
 
-		try {
-			oos.writeObject(sendingPeers);
-		} catch (IOException ex) {
-			Logger.getLogger(ServerTestClass.class.getName()).log(Level.SEVERE, null, ex);
+			ArrayList<FileInfo> sendingPeers = new ArrayList<FileInfo>();
+			System.out.println("Searching for the file name...!!!");
+
+			for (int j = 0; j < globalArray.size(); j++) {
+				FileInfo fileInfo = globalArray.get(j);
+				Boolean tf = fileInfo.fileName.equals(str);
+				if (tf) {
+					index = j;
+					sendingPeers.add(fileInfo);
+				}
+			}
+			if(index==-1){
+				try {
+					oos.writeObject("NotFound");
+				} catch (IOException ex) {
+					Logger.getLogger(ServerTestClass.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+			else{
+				try {
+					oos.writeObject("Found");
+					oos.writeObject(sendingPeers);
+				} catch (IOException ex) {
+					Logger.getLogger(ServerTestClass.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+
+			try {
+				flg = (String) ois.readObject();
+			} catch (IOException | ClassNotFoundException ex) {
+				Logger.getLogger(ServerTestClass.class.getName()).log(Level.SEVERE, null, ex);
+			}
+			if(flg=="0"){
+				break;
+			}
 		}
 	}
 }
